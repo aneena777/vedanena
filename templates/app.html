@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women's Healthy Diet Planner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 700px;
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .user-greeting {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+            gap: 10px;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ddd;
+            z-index: -1;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: #ddd;
+            border-radius: 50%;
+            font-weight: bold;
+            color: #666;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .step.completed {
+            background: #10b981;
+            color: white;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin-bottom: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .date-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-next {
+            background: #667eea;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-next:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-prev {
+            background: #e5e7eb;
+            color: #333;
+            flex: 1;
+        }
+
+        .btn-prev:hover {
+            background: #d1d5db;
+        }
+
+        .btn-submit {
+            background: #10b981;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .result-section {
+            display: none;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .result-section::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .result-section::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .result-section::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .diet-card {
+            background: #f9fafb;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .diet-card.period {
+            border-left-color: #ec4899;
+        }
+
+        .diet-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .meal-section {
+            margin-bottom: 20px;
+        }
+
+        .meal-section h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .meal-list {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .meal-list p {
+            color: #555;
+            margin: 8px 0;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .meal-list p:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+
+        .mood-section {
+            background: #f0fdf4;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #10b981;
+        }
+
+        .mood-section p {
+            color: #333;
+            margin: 5px 0;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #10b981;
+        }
+
+        .btn-reset {
+            background: #ef4444;
+            color: white;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .btn-reset:hover {
+            background: #dc2626;
+        }
+
+        .form-hint {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .nutrition-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .nutrition-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .nutrition-card.macro {
+            border-color: #667eea;
+            background: #ede9fe;
+        }
+
+        .nutrition-card.micro {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .nutrition-card h5 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+        }
+
+        .nutrition-card p {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .health-tracker-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .health-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.85rem;
+            margin: 5px 0;
+        }
+
+        .stat-status {
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .status-normal {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-alert {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .health-recommendations {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+            margin-top: 15px;
+        }
+
+        .health-recommendations h4 {
+            color: #065f46;
+            margin-bottom: 10px;
+        }
+
+        .health-recommendations ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .health-recommendations li {
+            color: #555;
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .health-recommendations li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .cycle-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .cycle-info p {
+            margin: 8px 0;
+        }
+
+        .bmi-chart {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        #feedbackSection, #nextCycleSection {
+            background: #f0fdf4;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #10b981;
+            margin-bottom: 20px;
+        }
+
+        #feedbackSection h3, #nextCycleSection h3 {
+            color: #065f46;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+                max-width: 100%;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            .date-group {
+                grid-template-columns: 1fr;
+            }
+
+            .health-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .btn-next, .btn-prev {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="user-header">
+            <div class="user-greeting">👋 Welcome, {{ user.name }}!</div>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step active" data-step="1">1</div>
+            <div class="step" data-step="2">2</div>
+            <div class="step" data-step="3">3</div>
+            <div class="step" data-step="4">4</div>
+            <div class="step" data-step="5">✓</div>
+        </div>
+
+        <!-- STEP 1: Personal Details -->
+        <div class="form-section active" id="step1">
+            <h1>👤 Personal Details</h1>
+            <p style="color: #666; text-align: center; margin-bottom: 20px;">Let's start with your basic information</p>
+
+            <form id="form1">
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email" value="{{ user.email }}" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age (Years) *</label>
+                    <input type="number" id="age" name="age" required min="18" max="100" placeholder="Enter your age">
+                </div>
+
+                <div class="form-group">
+                    <label for="height">Height (cm) *</label>
+                    <input type="number" id="height" name="height" required min="100" max="250" placeholder="e.g., 165">
+                    <p class="form-hint">This helps calculate your dietary needs</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="weight">Weight (kg) *</label>
+                    <input type="number" id="weight" name="weight" required min="30" max="200" placeholder="e.g., 65">
+                    <p class="form-hint">Used for personalized recommendations</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="activity">Activity Level *</label>
+                    <select id="activity" name="activity" required>
+                        <option value="">Select your activity level</option>
+                        <option value="sedentary">Sedentary (little or no exercise)</option>
+                        <option value="light">Light (exercise 1-3 days/week)</option>
+                        <option value="moderate">Moderate (exercise 3-5 days/week)</option>
+                        <option value="active">Active (exercise 6-7 days/week)</option>
+                        <option value="very_active">Very Active (physical job or training)</option>
+                    </select>
+                </div>
+
+                <div class="buttons">
+                    <button type="button" class="btn-next" onclick="nextStep(1)">Next →</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- STEP 2: Diet Preferences -->
+        <div class="form-section" id="step2">
+            <h1>🥗 Diet Preferences</h1>
+            <p style="color: #666; text-align: center; margin-bottom: 20px;">Tell us about your dietary needs</p>
+
+            <form id="form2">
+                <div class="form-group">
+                    <label for="diet-reason">Why do you need diet changes? *</label>
+                    <select id="diet-reason" name="dietReason" required>
+                        <option value="">Select a reason</option>
+                        <option value="weight_loss">Weight Loss</option>
+                        <option value="weight_gain">Weight Gain</option>
+                        <option value="muscle_build">Muscle Building</option>
+                        <option value="general_health">General Health & Wellness</option>
+                        <option value="energy_boost">Energy Boost</option>
+                        <option value="hormonal_balance">Hormonal Balance</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="diet-type">Preferred Diet Type *</label>
+                    <select id="diet-type" name="dietType" required>
+                        <option value="">Select diet type</option>
+                        <option value="balanced">Balanced Diet</option>
+                        <option value="vegetarian">Vegetarian</option>
+                        <option value="vegan">Vegan</option>
+                        <option value="high_protein">High Protein</option>
+                        <option value="low_carb">Low Carb</option>
+                        <option value="mediterranean">Mediterranean</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Dietary Restrictions/Allergies</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="dairy" name="restrictions" value="dairy">
+                            <label for="dairy">Dairy Free</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="gluten" name="restrictions" value="gluten">
+                            <label for="gluten">Gluten Free</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="nuts" name="restrictions" value="nuts">
+                            <label for="nuts">Nut Allergy</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="shellfish" name="restrictions" value="shellfish">
+                            <label for="shellfish">Seafood Allergy</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cravings">Food Cravings/Preferences</label>
+                    <textarea id="cravings" name="cravings" rows="3" placeholder="e.g., I love spicy food, prefer warm meals..."></textarea>
+                </div>
+
+                <div class="buttons">
+                    <button type="button" class="btn-prev" onclick="prevStep(2)">← Back</button>
+                    <button type="button" class="btn-next" onclick="nextStep(2)">Next →</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- STEP 3: Menstrual Cycle & Period Preferences -->
+        <div class="form-section" id="step3">
+            <h1>🔄 Menstrual Cycle & Period Preferences</h1>
+            <p style="color: #666; text-align: center; margin-bottom: 20px;">Track your cycle for personalized recommendations</p>
+
+            <form id="form3">
+                <div class="form-group">
+                    <label>Last 3 Period Start Dates *</label>
+                    <p class="form-hint">Enter your last 3 menstrual cycle start dates (most recent first)</p>
+
+                    <div class="date-group">
+                        <div>
+                            <label style="font-size: 0.9rem;">Period 1 (Most Recent)</label>
+                            <input type="date" id="period1" name="period1" required>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.9rem;">Period 2</label>
+                            <input type="date" id="period2" name="period2" required>
+                        </div>
+                    </div>
+
+                    <div class="date-group">
+                        <div>
+                            <label style="font-size: 0.9rem;">Period 3 (Oldest)</label>
+                            <input type="date" id="period3" name="period3" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cycle-length">Typical Cycle Length (days) *</label>
+                    <input type="number" id="cycle-length" name="cycleLength" min="20" max="40" required placeholder="e.g., 28">
+                </div>
+
+                <div class="form-group">
+                    <label for="period-duration">Period Duration (days) *</label>
+                    <input type="number" id="period-duration" name="periodDuration" min="3" max="10" required placeholder="e.g., 5">
+                </div>
+
+                <div class="form-group">
+                    <label>Common Symptoms During Period</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cramps" name="symptoms" value="cramps">
+                            <label for="cramps">Cramps</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="bloating" name="symptoms" value="bloating">
+                            <label for="bloating">Bloating</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="mood-swing" name="symptoms" value="mood swings">
+                            <label for="mood-swing">Mood Swings</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="fatigue" name="symptoms" value="fatigue">
+                            <label for="fatigue">Fatigue</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="period-cravings">Period Cravings</label>
+                    <textarea id="period-cravings" name="periodCravings" rows="2" placeholder="e.g., chocolate, sweets..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="period-mood">Mood During Period</label>
+                    <textarea id="period-mood" name="periodMood" rows="2" placeholder="e.g., I feel sad, irritable..."></textarea>
+                </div>
+
+                <div class="buttons">
+                    <button type="button" class="btn-prev" onclick="prevStep(3)">← Back</button>
+                    <button type="button" class="btn-next" onclick="nextStep(3)">Next →</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- STEP 4: Health Metrics -->
+        <div class="form-section" id="step4">
+            <h1>💪 Health Metrics</h1>
+            <p style="color: #666; text-align: center; margin-bottom: 20px;">Track your health for better recommendations</p>
+
+            <form id="form4">
+                <div class="form-group">
+                    <label for="blood-pressure-systolic">Blood Pressure Systolic (mmHg)</label>
+                    <input type="number" id="blood-pressure-systolic" name="bpSystolic" min="80" max="200" placeholder="e.g., 120">
+                </div>
+
+                <div class="form-group">
+                    <label for="blood-pressure-diastolic">Blood Pressure Diastolic (mmHg)</label>
+                    <input type="number" id="blood-pressure-diastolic" name="bpDiastolic" min="50" max="130" placeholder="e.g., 80">
+                </div>
+
+                <div class="form-group">
+                    <label for="hemoglobin">Hemoglobin Level (g/dL)</label>
+                    <input type="number" id="hemoglobin" name="hemoglobin" min="6" max="20" step="0.1" placeholder="e.g., 12.5">
+                </div>
+
+                <div class="form-group">
+                    <label for="blood-sugar">Fasting Blood Sugar (mg/dL)</label>
+                    <input type="number" id="blood-sugar" name="bloodSugar" min="40" max="300" placeholder="e.g., 100">
+                </div>
+
+                <div class="form-group">
+                    <label for="cholesterol">Total Cholesterol (mg/dL)</label>
+                    <input type="number" id="cholesterol" name="cholesterol" min="100" max="400" placeholder="e.g., 200">
+                </div>
+
+                <div class="form-group">
+                    <label for="exercise-frequency">Exercise Frequency (days/week)</label>
+                    <input type="number" id="exercise-frequency" name="exerciseFrequency" min="0" max="7" placeholder="e.g., 3">
+                </div>
+
+                <div class="form-group">
+                    <label for="sleep-hours">Average Sleep (hours/night)</label>
+                    <input type="number" id="sleep-hours" name="sleepHours" min="3" max="12" step="0.5" placeholder="e.g., 7.5">
+                </div>
+
+                <div class="buttons">
+                    <button type="button" class="btn-prev" onclick="prevStep(4)">← Back</button>
+                    <button type="button" class="btn-submit" onclick="submitForms()">Generate My Diet Plan →</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- RESULTS SECTION -->
+        <div class="result-section" id="results">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1>✨ Your Personalized Diet Plan</h1>
+                <p style="color: #666;">Based on your cycle phase and health profile</p>
+            </div>
+
+            <div class="success-message" id="userGreeting"></div>
+
+            <!-- Health Dashboard -->
+            <div class="health-tracker-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">📊 Your Health Dashboard</h2>
+                <div class="health-stats" id="healthStats"></div>
+                <div class="bmi-chart" id="bmiChartSection"></div>
+                <div id="healthRecommendations"></div>
+            </div>
+
+            <!-- Cycle Info -->
+            <div class="cycle-info" id="cycleInfo"></div>
+
+            <!-- Diet Plans -->
+            <div class="diet-card" id="normalDayCard"></div>
+            <div class="diet-card period" id="periodDayCard"></div>
+
+            <!-- Feedback -->
+            <div id="feedbackSection" style="display: none;">
+                <h3>📋 Help Us Improve Your Experience</h3>
+                <div class="form-group">
+                    <label for="helpfulness">How helpful is this plan?</label>
+                    <select id="helpfulness" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">Select rating</option>
+                        <option value="very_helpful">Very Helpful</option>
+                        <option value="helpful">Helpful</option>
+                        <option value="somewhat_helpful">Somewhat Helpful</option>
+                        <option value="not_helpful">Not Helpful</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="suggestions">Suggestions for improvement</label>
+                    <textarea id="suggestions" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" placeholder="Your feedback..."></textarea>
+                </div>
+                <button type="button" style="background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; width: 100%;" onclick="saveFeedbackAndShowNext()">Save Feedback & Continue</button>
+            </div>
+
+            <!-- Next Cycle Info -->
+            <div id="nextCycleSection" style="display: none;">
+                <h3>📅 Next Cycle Planning</h3>
+                <div id="nextCycleInfo"></div>
+            </div>
+
+            <button type="button" class="btn-reset" onclick="downloadData()" style="background: #667eea; margin-bottom: 10px;">⬇️ Download Your Data</button>
+            <button type="button" class="btn-reset" onclick="resetApp()">↻ Start Over</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let userData = {};
+
+        // Load existing data on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+        });
+
+        function loadUserData() {
+            fetch('/api/get-diet-data')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.data) {
+                        userData = data.data;
+                        // Fill form with existing data
+                        populateFormData();
+                    }
+                });
+        }
+
+        function populateFormData() {
+            // Populate all form fields with saved data
+            for (let key in userData) {
+                const element = document.querySelector(`[name="${key}"]`);
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        element.checked = Array.isArray(userData[key]) ? userData[key].includes(element.value) : false;
+                    } else {
+                        element.value = userData[key] || '';
+                    }
+                }
+            }
+        }
+
+        function nextStep(step) {
+            if (validateStep(step)) {
+                saveStepData(step);
+                currentStep++;
+                updateUI();
+            }
+        }
+
+        function prevStep(step) {
+            currentStep--;
+            updateUI();
+        }
+
+        function validateStep(step) {
+            const form = document.getElementById(`form${step}`);
+            if (!form.checkValidity()) {
+                alert('Please fill all required fields correctly');
+                return false;
+            }
+            return true;
+        }
+
+        function saveStepData(step) {
+            const forms = {
+                1: ['email', 'age', 'height', 'weight', 'activity'],
+                2: ['diet-reason', 'diet-type', 'restrictions', 'cravings'],
+                3: ['period1', 'period2', 'period3', 'cycle-length', 'period-duration', 'symptoms', 'period-cravings', 'period-mood'],
+                4: ['blood-pressure-systolic', 'blood-pressure-diastolic', 'hemoglobin', 'blood-sugar', 'cholesterol', 'exercise-frequency', 'sleep-hours']
+            };
+
+            forms[step].forEach(fieldId => {
+                const element = document.getElementById(fieldId.replace('-', '-'));
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        if (!userData[element.name]) userData[element.name] = [];
+                        if (element.checked && !userData[element.name].includes(element.value)) {
+                            userData[element.name].push(element.value);
+                        }
+                    } else {
+                        userData[element.name || fieldId] = element.value;
+                    }
+                }
+            });
+        }
+
+        function submitForms() {
+            if (validateStep(4)) {
+                saveStepData(4);
+                // Save to database
+                fetch('/api/save-diet-data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                }).then(() => showResults());
+            }
+        }
+
+        function updateUI() {
+            document.querySelectorAll('.form-section').forEach((el, index) => {
+                el.classList.toggle('active', index + 1 === currentStep);
+            });
+            document.querySelectorAll('.step').forEach((el, index) => {
+                const stepNum = index + 1;
+                el.classList.toggle('active', stepNum === currentStep);
+                el.classList.toggle('completed', stepNum < currentStep);
+            });
+        }
+
+        function showResults() {
+            currentStep = 5;
+            updateUI();
+            document.getElementById('results').classList.add('active');
+            document.getElementById('feedbackSection').style.display = 'block';
+            document.getElementById('nextCycleSection').style.display = 'none';
+            
+            // Generate results HTML (simplified version - add full implementation)
+            document.getElementById('userGreeting').innerHTML = `Welcome, <strong>${userData.name}</strong>! Your personalized plan is ready.`;
+            
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function saveFeedbackAndShowNext() {
+            const helpfulness = document.getElementById('helpfulness').value;
+            const suggestions = document.getElementById('suggestions').value;
+            
+            if (!helpfulness) {
+                alert('Please select a rating');
+                return;
+            }
+
+            fetch('/api/save-feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ helpfulness, suggestions })
+            }).then(() => {
+                document.getElementById('feedbackSection').style.display = 'none';
+                document.getElementById('nextCycleSection').style.display = 'block';
+                document.getElementById('nextCycleInfo').innerHTML = '<p>Your feedback has been saved!</p>';
+            });
+        }
+
+        function downloadData() {
+            const dataStr = JSON.stringify(userData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'my_diet_plan_data.json';
+            link.click();
+        }
+
+        function resetApp() {
+            if (confirm('Start over and clear current data?')) {
+                userData = {};
+                currentStep = 1;
+                document.querySelectorAll('form').forEach(f => f.reset());
+                document.getElementById('results').classList.remove('active');
+                updateUI();
+            }
+        }
+    </script>
+</body>
+</html>

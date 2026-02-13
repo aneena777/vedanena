@@ -1,0 +1,578 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 700px;
+    padding: 40px;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    position: relative;
+    gap: 10px;
+}
+
+.step-indicator::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #ddd;
+    z-index: -1;
+}
+
+@media (max-width: 750px) {
+    .step-indicator {
+        gap: 5px;
+    }
+
+    .step {
+        width: 40px;
+        height: 40px;
+        font-size: 0.8rem;
+    }
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: #ddd;
+    border-radius: 50%;
+    font-weight: bold;
+    color: #666;
+    position: relative;
+    z-index: 1;
+}
+
+.step.active {
+    background: #667eea;
+    color: white;
+}
+
+.step.completed {
+    background: #10b981;
+    color: white;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.form-section {
+    display: none;
+}
+
+.form-section.active {
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+}
+
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.checkbox-item label {
+    margin-bottom: 0;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.date-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+button {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-next {
+    background: #667eea;
+    color: white;
+    flex: 1;
+}
+
+.btn-next:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-prev {
+    background: #e5e7eb;
+    color: #333;
+    flex: 1;
+}
+
+.btn-prev:hover {
+    background: #d1d5db;
+}
+
+.btn-submit {
+    background: #10b981;
+    color: white;
+    width: 100%;
+}
+
+.btn-submit:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+}
+
+.result-section {
+    display: none;
+}
+
+.result-section.active {
+    display: block;
+}
+
+.diet-card {
+    background: #f9fafb;
+    border-left: 5px solid #667eea;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.diet-card.period {
+    border-left-color: #ec4899;
+}
+
+.diet-card h3 {
+    color: #333;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.diet-list {
+    list-style: none;
+    margin-bottom: 15px;
+}
+
+.diet-list li {
+    padding: 8px 0;
+    color: #555;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+}
+
+.diet-list li:before {
+    content: '✓';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: #10b981;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    margin-right: 10px;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.cycle-info {
+    background: #fef3c7;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #f59e0b;
+}
+
+.cycle-info p {
+    color: #333;
+    margin: 5px 0;
+}
+
+.meal-section {
+    margin-bottom: 20px;
+}
+
+.meal-section h4 {
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.meal-list {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.meal-list p {
+    color: #555;
+    margin: 8px 0;
+    padding-left: 15px;
+    position: relative;
+}
+
+.meal-list p:before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: #667eea;
+}
+
+.mood-section {
+    background: #f0fdf4;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #10b981;
+}
+
+.mood-section p {
+    color: #333;
+    margin: 5px 0;
+}
+
+.success-message {
+    background: #d1fae5;
+    color: #065f46;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #10b981;
+}
+
+.btn-reset {
+    background: #ef4444;
+    color: white;
+    margin-top: 20px;
+}
+
+.btn-reset:hover {
+    background: #dc2626;
+}
+
+.form-hint {
+    font-size: 0.85rem;
+    color: #999;
+    margin-top: 5px;
+}
+
+.nutrition-highlights {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.nutrition-card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.nutrition-card.macro {
+    border-color: #667eea;
+    background: #ede9fe;
+}
+
+.nutrition-card.micro {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
+.nutrition-card h5 {
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.nutrition-card p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 5px 0;
+}
+
+.health-tracker-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.health-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card.bmi-normal {
+    border-top: 4px solid #10b981;
+}
+
+.stat-card.bmi-overweight {
+    border-top: 4px solid #f59e0b;
+}
+
+.stat-card.bmi-obese {
+    border-top: 4px solid #ef4444;
+}
+
+.stat-card.bmi-underweight {
+    border-top: 4px solid #3b82f6;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #333;
+    margin: 5px 0;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.85rem;
+    margin: 5px 0;
+}
+
+.stat-status {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+    display: inline-block;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+.status-normal {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-alert {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.bmi-chart {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.bmi-chart h4 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.bmi-range {
+    display: flex;
+    height: 30px;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.bmi-range-segment {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.bmi-underweight { background: #3b82f6; }
+.bmi-normal { background: #10b981; }
+.bmi-overweight { background: #f59e0b; }
+.bmi-obese { background: #ef4444; }
+
+.bmi-indicator {
+    position: relative;
+    height: 5px;
+    background: #e5e7eb;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.bmi-indicator-mark {
+    position: absolute;
+    width: 3px;
+    height: 15px;
+    background: #333;
+    top: -5px;
+    border-radius: 2px;
+}
+
+.health-recommendations {
+    background: #f0fdf4;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #10b981;
+    margin-bottom: 20px;
+}
+
+.health-recommendations h4 {
+    color: #065f46;
+    margin-bottom: 10px;
+}
+
+.health-recommendations ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.health-recommendations li {
+    color: #555;
+    margin: 8px 0;
+    padding-left: 20px;
+    position: relative;
+}
+
+.health-recommendations li:before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #10b981;
+    font-weight: bold;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 25px;
+    }
+
+    .checkbox-group {
+        grid-template-columns: 1fr;
+    }
+
+    .date-group {
+        grid-template-columns: 1fr;
+    }
+
+    .step-indicator {
+        margin-bottom: 20px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+}

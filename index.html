@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women's Healthy Diet Planner</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 700px;
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+            gap: 10px;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ddd;
+            z-index: -1;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: #ddd;
+            border-radius: 50%;
+            font-weight: bold;
+            color: #666;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .step.completed {
+            background: #10b981;
+            color: white;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin-bottom: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .date-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-next {
+            background: #667eea;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-next:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-prev {
+            background: #e5e7eb;
+            color: #333;
+            flex: 1;
+        }
+
+        .btn-prev:hover {
+            background: #d1d5db;
+        }
+
+        .btn-submit {
+            background: #10b981;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .result-section {
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .diet-card {
+            background: #f9fafb;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .diet-card.period {
+            border-left-color: #ec4899;
+        }
+
+        .diet-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .meal-section {
+            margin-bottom: 20px;
+        }
+
+        .meal-section h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .meal-list {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .meal-list p {
+            color: #555;
+            margin: 8px 0;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .meal-list p:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+
+        .mood-section {
+            background: #f0fdf4;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #10b981;
+        }
+
+        .mood-section p {
+            color: #333;
+            margin: 5px 0;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #10b981;
+        }
+
+        .btn-reset {
+            background: #ef4444;
+            color: white;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .btn-reset:hover {
+            background: #dc2626;
+        }
+
+        .form-hint {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .nutrition-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .nutrition-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .nutrition-card.macro {
+            border-color: #667eea;
+            background: #ede9fe;
+        }
+
+        .nutrition-card.micro {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .nutrition-card h5 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .nutrition-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .health-tracker-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .health-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.85rem;
+            margin: 5px 0;
+        }
+
+        .stat-status {
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .status-normal {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-alert {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .bmi-chart {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .bmi-chart h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .bmi-range {
+            display: flex;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .bmi-range-segment {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .bmi-underweight { background: #3b82f6; }
+        .bmi-normal { background: #10b981; }
+        .bmi-overweight { background: #f59e0b; }
+        .bmi-obese { background: #ef4444; }
+
+        .health-recommendations {
+            background: #f0fdf4;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+            margin-bottom: 20px;
+        }
+
+        .health-recommendations h4 {
+            color: #065f46;
+            margin-bottom: 10px;
+        }
+
+        .health-recommendations ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .health-recommendations li {
+            color: #555;
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .health-recommendations li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .cycle-info {
+            background: #fef3c7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .cycle-info p {
+            color: #333;
+            margin: 5px 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            .date-group {
+                grid-template-columns: 1fr;
+            }
+
+            .step {
+                width: 40px;
+                height: 40px;
+                font-size: 0.8rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="step-indicator">
+            <div class="step active" data-step="1">1</div>
+            <div class="step" data-step="2">2</div>
+            <div class="step" data-step="3">3</div>
+            <div class="step" data-step="4">4</div>
+            <div class="step" data-step="5">✓</div>
+        </div>
+
+        <!-- STEP 1: Personal Details -->
+        <div class="form-section active" id="step1">
+            <h1> Personal Details</h1>
+            <p style="color: #666; text-align: center; margin-bottom: 20px;">Let's start with your basic information</p>
+
+            <form id="form1">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age (Years) *</label>
+                    <input type="number" id="age" name="age" required min="18" max="100" placeholder="Enter your age">
+                </div>
+
+                <div class="form-group">
+                    <label for="height">Height (cm) *</label>
+                    <input type="number" id="height" name="height" required min="100" max="250" placeholder="e.g., 165">
+                    <p class="form-hint">This helps calculate your dietary needs</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="weight">Weight (kg) *</label>
+                    <input type="number" id="weight" name="weight" required min="30" max="200" placeholder="e.g., 65">
+                    <p class="form-hint">Used for personalized recommendations</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="activity">Activity Level *</label>
+                    <select id="activity" name="activity" required>
+                        <option value="">Select your activity level</option>
+                        <option value="sedentary">Sedentary (little or no exercise)</option>
+                        <option value="light">Light (exercise 1-3 days/week)</option>
+                        <option value="moderate">Moderate (exercise 3-5 days/week)</option>
+                        <option value="active">Active (exercise 6-7 days/week)</option>
+                        <option value="very_active">Very Active (physical job or training)</option>
+                    </select>
+                </div>
+
+                <div class="buttons">
+                    <button type="button" class="btn-next" onclick="nextStep(1)">Next →</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- STEP 2: Normal Day Diet Preferences -->
+        <div class="form-section" id="step2">
+            <h1> Normal Day Diet Preferences</h1>
+            <p style="color: #666; text-align: center; margin-bottom: 20px;">Tell us about your dietary needs for regular days</p>
+
+            <form id="form2">
+                <div class="form-group">
+                    <label for="diet-reason">Why do you need diet changes? *</label>
+                    <select id="diet-reason" name="dietReason" required>
+                        <option value="">Select a reason</option>
+                        <option value="weight_loss">Weight Loss</option>
+                        <option value="weight_gain">Weight Gain</option>
+                        <option value="muscle_build">Muscle Building</option>
+                        <option value="general_health">General Health & Wellness</option>
+                        <option value="energy_boost">Energy Boost</option>
+                        <option value="hormonal_balance">Hormonal Balance</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="diet-type">Preferred Diet Type *</label>
+                    <select id="diet-type" name="dietType" required>
+                        <option value="">Select diet type</option>
+                        <option value="balanced">Balanced Diet</option>
+                        <option value="vegetarian">Vegetarian</option>
+                        <option value="vegan">Vegan</option>
+                        <option value="high_protein">High Protein</option>
+                        <option value="low_carb">Low Carb</option>
+                        <option value="mediterranean">Mediterranean</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Dietary Restrictions/Allergies</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="dairy" name="restrictions" value="dairy">
+                            <label for="dairy">Dairy Free</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="gluten" name="restrictions" value="gluten">
+                            <label for="gluten">Gluten Free</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="nuts" name="restrictions" value="nuts">
+                            <label for="nuts">Nut Allergy</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="shellfish" name="restrictions" value="shellfish">
+                            <label for="shellfish">Seafood Allergy</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cravings">Food Cravings/Preferences</label>
+                    <textarea id="cravings" name="cravings" rows="3" placeholder="e.g., I love spicy food, prefer warm meals, addicted to chocolate..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="health-conditions">Health Conditions (if any)</label>
+                    <textarea id="health-conditions" name="healthConditions" rows="3" placeholder="e.g., PCOS, thyroid issues, anemia..."></textarea>
+                </div>
+
+                <div class="buttons">
+                    <button type="button" class="btn-prev" onclick="prevStep(2)">← Back</button>
+                    <button type="button" class="btn-next" onclick="nextStep(2)">Next →</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- STEP 3: Menstrual Cycle & Period Preferences -->
+        <div class="form-section" id="step3">
+            <h1> Your Menstrual Cycle & Period Preferences</h1>
+            <p style="color: #666; text-align: center; margin-bottom: 20px;">Track your cycle and tell us about period day preferences</p>
+
+            <form id="form3">
+                <div class="form-group">
+                    <label>Last 3 Period Start Dates *</label>
+                    <p class="form-hint">Enter your last 3 menstrual cycle start dates (most recent first)</p>
+
+                    <div class="date-group">
+                        <div>
+                            <label style="font-size: 0.9rem;">Period 1 (Most Recent)</label>
+                            <input type="date" id="period1" name="period1" required>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.9rem;">Period 2</label>
+                            <input type="date" id="period2" name="period2" required>
+                        </div>
+                    </div>
+
+                    <div class="date-group">
+                        <div>
+                            <label style="font-size: 0.9rem;">Period 3 (Oldest)</label>
+                            <input type="date" id="period3" name="period3" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cycle-length">Typical Cycle Length (days) *</label>
+                    <input type="number" id="cycle-length" name="cycleLength" min="20" max="40" required placeholder="e.g., 28-30">
+                    <p class="form-hint">If unsure, we'll calculate from your dates above</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="period-duration">Period Duration (days) *</label>
+                    <input type="number" id="period-duration" name="periodDuration" min="3" max="10" required placeholder="e.g., 5">
+                    <p class="form-hint">How many days does your period last?</p>
+                </div>
+
+                <div class="form-group" style="background: #f3e5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #9c27b0; margin-top: 30px;">
+                    <h3 style="margin-top: 0; color: #333;">🩸 Period Day Preferences</h3>
+                </div>
+
+                <div class="form-group">
+                    <label for="period-symptoms">Common Symptoms During Period</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cramps" name="symptoms" value="cramps">
+                            <label for="cramps">Cramps</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="bloating" name="symptoms" value="bloating">
+                            <label for="bloating">Bloating</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="mood-swing" name="symptoms" value="mood swings">
+                            <label for="mood-swing">Mood Swings</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="fatigue" name="symptoms" value="fatigue">
+                            <label for="fatigue">Fatigue</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="period-cravings">Period Cravings</label>
+                    <textarea id="period-cravings" name="periodCravings" rows="2" placeholder="e.g., I crave chocolate, sweets, salty snacks during my period..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="period-mood">Mood During Period</label>
+                    <textarea id="period-mood" name="periodMood" rows="2" placeholder="e.g., I feel sad, irritable, anxious during my period..."></textarea>
+                </div>
+
+                <div class="buttons">
+                    <button type="button" class="btn-prev" onclick="prevStep(3)">← Back</button>
+                    <button type="button" class="btn-next" onclick="nextStep(3)">Next →</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- STEP 4: Health Metrics & BMI Calculator -->
+        <div class="form-section" id="step4">
+            <h1>💪 Health Metrics & Tracker</h1>
+            <p style="color: #666; text-align: center; margin-bottom: 20px;">Track your health metrics for better recommendations</p>
+
+            <form id="form4">
+                <div class="form-group">
+                    <label for="blood-pressure-systolic">Blood Pressure (Systolic) mmHg</label>
+                    <input type="number" id="blood-pressure-systolic" name="bpSystolic" min="80" max="200" placeholder="e.g., 120">
+                    <p class="form-hint">Optional - helps track cardiovascular health</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="blood-pressure-diastolic">Blood Pressure (Diastolic) mmHg</label>
+                    <input type="number" id="blood-pressure-diastolic" name="bpDiastolic" min="50" max="130" placeholder="e.g., 80">
+                </div>
+
+                <div class="form-group">
+                    <label for="hemoglobin">Hemoglobin Level (g/dL)</label>
+                    <input type="number" id="hemoglobin" name="hemoglobin" min="6" max="20" step="0.1" placeholder="e.g., 12.5">
+                    <p class="form-hint">Important for females (normal 12-16 g/dL)</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="blood-sugar">Fasting Blood Sugar (mg/dL)</label>
+                    <input type="number" id="blood-sugar" name="bloodSugar" min="40" max="300" placeholder="e.g., 100">
+                    <p class="form-hint">Optional - helps track diabetes risk</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="cholesterol">Total Cholesterol (mg/dL)</label>
+                    <input type="number" id="cholesterol" name="cholesterol" min="100" max="400" placeholder="e.g., 200">
+                    <p class="form-hint">Optional - for heart health monitoring</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Medical History/Conditions</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="diabetes" name="medicalHistory" value="diabetes">
+                            <label for="diabetes">Diabetes</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="thyroid" name="medicalHistory" value="thyroid">
+                            <label for="thyroid">Thyroid Issues</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="pcos" name="medicalHistory" value="PCOS">
+                            <label for="pcos">PCOS</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="hypertension" name="medicalHistory" value="hypertension">
+                            <label for="hypertension">High BP</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="anemia" name="medicalHistory" value="anemia">
+                            <label for="anemia">Anemia</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="ibs" name="medicalHistory" value="IBS">
+                            <label for="ibs">IBS</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="fitness-goal">Fitness Goals</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="goal-weight-loss" name="fitnessGoals" value="weight loss">
+                            <label for="goal-weight-loss">Weight Loss</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="goal-strength" name="fitnessGoals" value="strength">
+                            <label for="goal-strength">Build Strength</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="goal-flexibility" name="fitnessGoals" value="flexibility">
+                            <label for="goal-flexibility">Flexibility</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="goal-endurance" name="fitnessGoals" value="endurance">
+                            <label for="goal-endurance">Endurance</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="exercise-frequency">Exercise Frequency (days/week)</label>
+                    <input type="number" id="exercise-frequency" name="exerciseFrequency" min="0" max="7" placeholder="e.g., 3">
+                </div>
+
+                <div class="form-group">
+                    <label for="sleep-hours">Average Sleep (hours/night)</label>
+                    <input type="number" id="sleep-hours" name="sleepHours" min="3" max="12" step="0.5" placeholder="e.g., 7.5">
+                    <p class="form-hint">Important for hormonal balance</p>
+                </div>
+
+                <div class="buttons">
+                    <button type="button" class="btn-prev" onclick="prevStep(4)">← Back</button>
+                    <button type="button" class="btn-submit" onclick="submitForms()">Generate Health & Diet Plan →</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- RESULTS SECTION -->
+        <div class="result-section" id="results">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1> Your Personalized Diet Plan</h1>
+                <p style="color: #666;">Based on your personal information and cycle phase</p>
+            </div>
+
+            <div class="success-message" id="userGreeting"></div>
+
+            <!-- Health Metrics Dashboard -->
+            <div class="health-tracker-section" id="healthTrackerSection">
+                <h2 style="margin-bottom: 20px; text-align: center;">📊 Your Health Dashboard</h2>
+                <div class="health-stats" id="healthStats"></div>
+                <div class="bmi-chart" id="bmiChartSection"></div>
+                <div id="healthRecommendations"></div>
+            </div>
+
+            <!-- Cycle Info -->
+            <div class="cycle-info" id="cycleInfo"></div>
+
+            <!-- Current Phase Info -->
+            <div id="phaseInfo"></div>
+
+            <!-- Normal Day Diet -->
+            <div class="diet-card" id="normalDayCard"></div>
+
+            <!-- Period Day Diet -->
+            <div class="diet-card period" id="periodDayCard"></div>
+
+            <!-- Feedback Survey -->
+            <div id="feedbackSection" style="background: #f0fdf4; padding: 20px; border-radius: 12px; border-left: 4px solid #10b981; margin-bottom: 20px;">
+                <h3 style="margin-top: 0; color: #065f46;">📋 Help Us Improve Your Experience</h3>
+                <div class="form-group">
+                    <label for="helpfulness">How helpful is this diet plan?</label>
+                    <select id="helpfulness" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">Select rating</option>
+                        <option value="very_helpful">Very Helpful</option>
+                        <option value="helpful">Helpful</option>
+                        <option value="somewhat_helpful">Somewhat Helpful</option>
+                        <option value="not_helpful">Not Very Helpful</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="suggestions">Any suggestions or changes?</label>
+                    <textarea id="suggestions" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-family: inherit;" placeholder="Tell us what you'd like to improve..."></textarea>
+                </div>
+                <button type="button" style="background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;" onclick="saveFeedback()">Save Feedback & Continue</button>
+            </div>
+
+            <!-- Next Cycle Planning -->
+            <div id="nextCycleSection" style="background: #e0f2fe; padding: 20px; border-radius: 12px; border-left: 4px solid #0284c7; margin-bottom: 20px; display: none;">
+                <h3 style="margin-top: 0; color: #0c4a6e;">📅 Next Cycle Planning</h3>
+                <div id="nextCycleInfo"></div>
+            </div>
+
+            <button type="button" class="btn-reset" onclick="resetApp()">Start Over ↻</button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize
+        let currentStep = 1;
+        let userData = {};
+
+        // Retrieve stored data on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const stored = localStorage.getItem('dietPlanData');
+            if (stored) {
+                userData = JSON.parse(stored);
+                showResults();
+            }
+        });
+
+        function nextStep(step) {
+            if (validateStep(step)) {
+                saveStepData(step);
+                currentStep++;
+                updateUI();
+            }
+        }
+
+        function prevStep(step) {
+            currentStep--;
+            updateUI();
+        }
+
+        function validateStep(step) {
+            const form = document.getElementById(`form${step}`);
+            if (!form.checkValidity()) {
+                alert('Please fill all required fields correctly');
+                return false;
+            }
+            return true;
+        }
+
+        function saveStepData(step) {
+            if (step === 1) {
+                userData.name = document.getElementById('name').value;
+                userData.email = document.getElementById('email').value;
+                userData.age = parseInt(document.getElementById('age').value);
+                userData.height = parseInt(document.getElementById('height').value);
+                userData.weight = parseInt(document.getElementById('weight').value);
+                userData.activity = document.getElementById('activity').value;
+            } else if (step === 2) {
+                userData.dietReason = document.getElementById('diet-reason').value;
+                userData.dietType = document.getElementById('diet-type').value;
+                userData.restrictions = Array.from(document.querySelectorAll('input[name="restrictions"]:checked')).map(x => x.value);
+                userData.cravings = document.getElementById('cravings').value;
+                userData.healthConditions = document.getElementById('health-conditions').value;
+            } else if (step === 3) {
+                userData.period1 = document.getElementById('period1').value;
+                userData.period2 = document.getElementById('period2').value;
+                userData.period3 = document.getElementById('period3').value;
+                userData.cycleLength = parseInt(document.getElementById('cycle-length').value);
+                userData.periodDuration = parseInt(document.getElementById('period-duration').value);
+                userData.symptoms = Array.from(document.querySelectorAll('input[name="symptoms"]:checked')).map(x => x.value);
+                userData.periodCravings = document.getElementById('period-cravings').value;
+                userData.periodMood = document.getElementById('period-mood').value;
+            } else if (step === 4) {
+                userData.bpSystolic = parseInt(document.getElementById('blood-pressure-systolic').value) || 0;
+                userData.bpDiastolic = parseInt(document.getElementById('blood-pressure-diastolic').value) || 0;
+                userData.hemoglobin = parseFloat(document.getElementById('hemoglobin').value) || 0;
+                userData.bloodSugar = parseInt(document.getElementById('blood-sugar').value) || 0;
+                userData.cholesterol = parseInt(document.getElementById('cholesterol').value) || 0;
+                userData.medicalHistory = Array.from(document.querySelectorAll('input[name="medicalHistory"]:checked')).map(x => x.value);
+                userData.fitnessGoals = Array.from(document.querySelectorAll('input[name="fitnessGoals"]:checked')).map(x => x.value);
+                userData.exerciseFrequency = parseInt(document.getElementById('exercise-frequency').value) || 0;
+                userData.sleepHours = parseFloat(document.getElementById('sleep-hours').value) || 0;
+            }
+        }
+
+        function updateUI() {
+            document.querySelectorAll('.form-section').forEach((el, index) => {
+                el.classList.toggle('active', index + 1 === currentStep);
+            });
+
+            document.querySelectorAll('.step').forEach((el, index) => {
+                const stepNum = index + 1;
+                el.classList.toggle('active', stepNum === currentStep);
+                el.classList.toggle('completed', stepNum < currentStep);
+            });
+        }
+
+        function submitForms() {
+            if (validateStep(4)) {
+                saveStepData(4);
+                localStorage.setItem('dietPlanData', JSON.stringify(userData));
+                showResults();
+            }
+        }
+
+        function calculateCycleInfo() {
+            // Validate period dates exist
+            if (!userData.period1 || !userData.period2 || !userData.period3) {
+                console.error('Period dates not found:', userData);
+                return {
+                    nextPeriod: new Date(),
+                    cycleLength: parseInt(userData.cycleLength) || 28,
+                    phase: 'follicular',
+                    daysIntoCurrentCycle: 0,
+                    isPeriodDays: false,
+                    periodDuration: parseInt(userData.periodDuration) || 5,
+                    daysUntilNextPeriod: 0
+                };
+            }
+
+            const date1 = new Date(userData.period1);
+            const date2 = new Date(userData.period2);
+            const date3 = new Date(userData.period3);
+
+            // Check if dates are valid
+            if (isNaN(date1.getTime()) || isNaN(date2.getTime()) || isNaN(date3.getTime())) {
+                console.error('Invalid dates:', { period1: userData.period1, period2: userData.period2, period3: userData.period3 });
+                return {
+                    nextPeriod: new Date(),
+                    cycleLength: parseInt(userData.cycleLength) || 28,
+                    phase: 'follicular',
+                    daysIntoCurrentCycle: 0,
+                    isPeriodDays: false,
+                    periodDuration: parseInt(userData.periodDuration) || 5,
+                    daysUntilNextPeriod: 0
+                };
+            }
+
+            const gap1 = Math.round((date1 - date2) / (1000 * 60 * 60 * 24));
+            const gap2 = Math.round((date2 - date3) / (1000 * 60 * 60 * 24));
+
+            let averageCycle = Math.round((gap1 + gap2) / 2);
+            
+            // Ensure cycle length is reasonable (between 20-40 days)
+            if (averageCycle < 20 || averageCycle > 40 || isNaN(averageCycle)) {
+                averageCycle = parseInt(userData.cycleLength) || 28;
+            }
+            
+            userData.calculatedCycleLength = averageCycle;
+
+            const nextPeriodDate = new Date(date1);
+            nextPeriodDate.setDate(nextPeriodDate.getDate() + averageCycle);
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            let cyclePhase = 'follicular';
+            let daysIntoCurrentCycle = Math.round((today - date1) / (1000 * 60 * 60 * 24));
+            const periodDuration = parseInt(userData.periodDuration) || 5;
+            
+            // Handle when we're past the cycle
+            if (daysIntoCurrentCycle > averageCycle) {
+                const cyclesCompleted = Math.floor(daysIntoCurrentCycle / averageCycle);
+                daysIntoCurrentCycle = daysIntoCurrentCycle - (cyclesCompleted * averageCycle);
+            }
+            
+            // Handle negative days (future period)
+            if (daysIntoCurrentCycle < 0) {
+                daysIntoCurrentCycle = 0;
+            }
+
+            let isPeriodDays = false;
+            if (daysIntoCurrentCycle <= periodDuration && daysIntoCurrentCycle >= 0) {
+                cyclePhase = 'menstrual';
+                isPeriodDays = true;
+            } else if (daysIntoCurrentCycle < 14) {
+                cyclePhase = 'follicular';
+            } else if (daysIntoCurrentCycle < 21) {
+                cyclePhase = 'ovulation';
+            } else {
+                cyclePhase = 'luteal';
+            }
+
+            const daysUntilNextPeriod = Math.max(0, averageCycle - daysIntoCurrentCycle);
+
+            console.log('Cycle Info:', { cycleLength: averageCycle, daysIntoCurrentCycle, phase: cyclePhase, isPeriodDays });
+
+            return {
+                nextPeriod: nextPeriodDate,
+                cycleLength: averageCycle,
+                phase: cyclePhase,
+                daysIntoCurrentCycle: daysIntoCurrentCycle,
+                isPeriodDays: isPeriodDays,
+                periodDuration: periodDuration,
+                daysUntilNextPeriod: daysUntilNextPeriod
+            };
+        }
+
+        function getDietRecommendations(phase) {
+            const dietRecommendations = {
+                menstrual: {
+                    title: '🔴 MENSTRUAL PHASE - Period Days',
+                    subtitle: 'Days 1-5 of your cycle',
+                    meals: ['Breakfast: Oatmeal with berries, honey, and almonds (iron + carbs)', 'Snack: Red dates or raisins with green tea', 'Lunch: Red meat or spinach with sweet potato and beetroot', 'Snack: Pomegranate or watermelon', 'Dinner: Salmon with broccoli and brown rice (Omega-3 + iron)'],
+                    nutrients: ['Iron (combats fatigue)', 'Vitamin B12 (energy)', 'Magnesium (cramps & mood)', 'Omega-3 (inflammation)', 'Calcium (bone health)'],
+                    avoidance: ['Caffeine (may increase cramps)', 'High sugar foods', 'Greasy foods', 'Alcohol'],
+                    hydration: '3.5-4 liters water daily (blood loss)',
+                    tip: 'Eat warm foods, increase red meat/spinach for iron replenishment'
+                },
+                follicular: {
+                    title: '🟡 FOLLICULAR PHASE - Energy Building',
+                    subtitle: 'Days 6-13 of your cycle',
+                    meals: ['Breakfast: Greek yogurt with granola and mixed berries', 'Snack: Apple with almond butter', 'Lunch: Quinoa salad with chickpeas, cucumber, and lemon dressing', 'Snack: Nuts and seeds mix', 'Dinner: Grilled chicken with asparagus and wild rice'],
+                    nutrients: ['Protein (muscle building)', 'Complex carbs (energy)', 'Folate (cell growth)', 'Antioxidants (skin glow)', 'B vitamins (metabolism)'],
+                    avoidance: ['Skip restrictive eating', 'Avoid missing meals'],
+                    hydration: '2-2.5 liters water daily',
+                    tip: 'This is the best time to start new healthy habits! Metabolism is rising, energy is increasing!'
+                },
+                ovulation: {
+                    title: '🟣 OVULATION PHASE - Peak Energy',
+                    subtitle: 'Days 14-20 of your cycle',
+                    meals: ['Breakfast: Smoothie with spinach, banana, protein powder, and almond milk', 'Snack: Hard-boiled eggs (2-3)', 'Lunch: Tuna salad with mixed greens and olive oil dressing', 'Snack: Greek yogurt with honey and walnuts', 'Dinner: Lean beef steak with sweet potato and broccoli'],
+                    nutrients: ['High protein (peak metabolic rate)', 'Lean meats (sustain energy)', 'Healthy fats (brain function)', 'Vegetables (detox)', 'Complex carbs (fuel)'],
+                    avoidance: ['Refined sugars', 'Heavy fried foods'],
+                    hydration: '2.5-3 liters water daily',
+                    tip: 'Your metabolism is at its peak! This is ideal time for heavy workouts and adding more protein!'
+                },
+                luteal: {
+                    title: '🟠 LUTEAL PHASE - Cozy Nourishment',
+                    subtitle: 'Days 21-28 of your cycle',
+                    meals: ['Breakfast: Warm oatmeal with nuts, seeds, and cinnamon', 'Snack: Dark chocolate (70% cacao) with almonds', 'Lunch: Slow-cooked stew with lean meat, vegetables, and whole grains', 'Snack: Whole grain bread with peanut butter', 'Dinner: Baked salmon with roasted vegetables and sweet potato'],
+                    nutrients: ['Magnesium (mood & sleep)', 'Serotonin-boosting foods', 'Complex carbs (stabilize mood)', 'Omega-3 (brain health)', 'Iron (prepare for period)'],
+                    avoidance: ['Restrict caffeine (affects sleep)', 'Limit high-sodium foods (bloating)', 'Avoid skipping meals (mood swings)'],
+                    hydration: '2-2.5 liters water daily',
+                    tip: 'Progesterone is high, metabolism slows. Focus on comfort foods, quality sleep, and self-care'
+                }
+            };
+            return dietRecommendations[phase] || dietRecommendations.follicular;
+        }
+
+        function getMoodCravingAdvice(symptoms) {
+            const advice = {
+                cramps: '🌡️ Include magnesium-rich foods (dark chocolate, nuts, seeds) and increase calcium intake',
+                bloating: '💧 Reduce sodium, increase potassium (bananas, coconut water), stay hydrated',
+                'mood swings': '😊 Eat serotonin-boosting foods (dark chocolate, bananas, walnuts, turkey)',
+                fatigue: '⚡ Prioritize iron-rich foods, B vitamins, and adequate protein'
+            };
+            let result = 'Based on your symptoms:\n\n';
+            if (symptoms && symptoms.length > 0) {
+                symptoms.forEach(symptom => {
+                    result += (advice[symptom] || '') + '\n';
+                });
+            }
+            return result;
+        }
+
+        function calculateBMI(height, weight) {
+            const heightInMeters = height / 100;
+            const bmi = weight / (heightInMeters * heightInMeters);
+            return parseFloat(bmi.toFixed(1));
+        }
+
+        function getBMICategory(bmi) {
+            if (bmi < 18.5) return { category: 'Underweight', status: 'bmi-underweight' };
+            if (bmi < 25) return { category: 'Normal Weight', status: 'bmi-normal' };
+            if (bmi < 30) return { category: 'Overweight', status: 'bmi-overweight' };
+            return { category: 'Obese', status: 'bmi-obese' };
+        }
+
+        function getBloodPressureStatus(systolic, diastolic) {
+            if (systolic === 0 || diastolic === 0) return { status: 'unknown', message: 'Not provided' };
+            if (systolic < 120 && diastolic < 80) return { status: 'normal', message: 'Normal' };
+            if (systolic < 130 && diastolic < 80) return { status: 'elevated', message: 'Elevated' };
+            if (systolic < 140 || diastolic < 90) return { status: 'stage1-hypertension', message: 'Stage 1 Hypertension' };
+            return { status: 'stage2-hypertension', message: 'Stage 2 Hypertension' };
+        }
+
+        function getHemoglobinStatus(hemoglobin) {
+            if (hemoglobin === 0) return { status: 'unknown', message: 'Not provided' };
+            if (hemoglobin < 12) return { status: 'low', message: 'Low - Possible Anemia' };
+            if (hemoglobin <= 16) return { status: 'normal', message: 'Normal' };
+            return { status: 'high', message: 'High' };
+        }
+
+        function getBloodSugarStatus(bloodSugar) {
+            if (bloodSugar === 0) return { status: 'unknown', message: 'Not provided' };
+            if (bloodSugar < 100) return { status: 'normal', message: 'Normal Fasting' };
+            if (bloodSugar < 126) return { status: 'prediabetes', message: 'Prediabetic Range' };
+            return { status: 'diabetes', message: 'Diabetic Range' };
+        }
+
+        function getCholesterolStatus(cholesterol) {
+            if (cholesterol === 0) return { status: 'unknown', message: 'Not provided' };
+            if (cholesterol < 200) return { status: 'desirable', message: 'Desirable' };
+            if (cholesterol < 240) return { status: 'borderline', message: 'Borderline High' };
+            return { status: 'high', message: 'High' };
+        }
+
+        function getDailyCalorieNeeds(weight, height, age, activity) {
+            const bmr = 655 + (9.6 * weight) + (1.8 * height) - (4.7 * age);
+            const activityMultipliers = { 'sedentary': 1.2, 'light': 1.375, 'moderate': 1.55, 'active': 1.725, 'very_active': 1.9 };
+            const multiplier = activityMultipliers[activity] || 1.2;
+            return Math.round(bmr * multiplier);
+        }
+
+        function generateHealthRecommendations(bmi, bp, hemoglobin, bloodSugar, cholesterol, medicalHistory, sleepHours, exerciseFrequency) {
+            let recommendations = [];
+            if (bmi < 18.5) recommendations.push('💪 Focus on nutrient-dense foods to gain healthy weight gradually.');
+            else if (bmi >= 25 && bmi < 30) recommendations.push('🎯 Gradual weight loss through balanced diet and exercise.');
+            else if (bmi >= 30) recommendations.push('⚠️ Consult a nutritionist for structured weight loss plan.');
+            if (bp.status === 'elevated' || bp.status === 'stage1-hypertension') recommendations.push('🩺 Reduce sodium intake.');
+            if (hemoglobin < 12) recommendations.push('🥗 Increase iron intake: Red meat, spinach, lentils.');
+            if (bloodSugar.status === 'prediabetes') recommendations.push('⚡ Reduce refined sugars and simple carbs.');
+            if (cholesterol.status === 'borderline' || cholesterol.status === 'high') recommendations.push('❤️ Reduce saturated fats, increase omega-3s.');
+            if (sleepHours < 6) recommendations.push('😴 Aim for 7-9 hours sleep nightly.');
+            if (exerciseFrequency < 3) recommendations.push('🏃 Aim for 150 minutes moderate-intensity exercise weekly.');
+            return recommendations.length > 0 ? recommendations : ['Your health metrics look good! Continue healthy lifestyle.'];
+        }
+
+        function showResults() {
+            try {
+                const cycleInfo = calculateCycleInfo();
+                const phase = cycleInfo.phase;
+                const recommendations = getDietRecommendations(phase);
+
+                document.getElementById('userGreeting').innerHTML = `Welcome back, <strong>${userData.name || 'User'}</strong>! 👋<br>Your personalized diet plan has been generated based on your cycle phase today.`;
+
+                const bmi = calculateBMI(userData.height, userData.weight);
+                const bmiCat = getBMICategory(bmi);
+                const bpStatus = getBloodPressureStatus(userData.bpSystolic, userData.bpDiastolic);
+                const hemoglobinStatus = getHemoglobinStatus(userData.hemoglobin);
+                const bloodSugarStatus = getBloodSugarStatus(userData.bloodSugar);
+                const cholesterolStatus = getCholesterolStatus(userData.cholesterol);
+                const dailyCalories = getDailyCalorieNeeds(userData.weight, userData.height, userData.age, userData.activity);
+                const healthRecs = generateHealthRecommendations(bmi, bpStatus, userData.hemoglobin, bloodSugarStatus, cholesterolStatus, userData.medicalHistory, userData.sleepHours, userData.exerciseFrequency);
+
+                // Build Health Stats with proper status colors
+                let healthStatsHTML = '';
+                healthStatsHTML += `<div class="stat-card"><div class="stat-value">${bmi}</div><div class="stat-label">BMI</div><div class="stat-status status-${bmiCat.status === 'bmi-normal' ? 'normal' : 'warning'}">${bmiCat.category}</div></div>`;
+                healthStatsHTML += `<div class="stat-card"><div class="stat-value">${dailyCalories}</div><div class="stat-label">Daily Calories</div><div class="stat-status status-normal">Estimated</div></div>`;
+                
+                if (userData.bpSystolic > 0) {
+                    const bpColor = bpStatus.status === 'normal' ? 'normal' : 'warning';
+                    healthStatsHTML += `<div class="stat-card"><div class="stat-value">${userData.bpSystolic}/${userData.bpDiastolic}</div><div class="stat-label">Blood Pressure</div><div class="stat-status status-${bpColor}">${bpStatus.message}</div></div>`;
+                }
+                if (userData.hemoglobin > 0) {
+                    const hemoColor = hemoglobinStatus.status === 'normal' ? 'normal' : 'alert';
+                    healthStatsHTML += `<div class="stat-card"><div class="stat-value">${userData.hemoglobin}</div><div class="stat-label">Hemoglobin (g/dL)</div><div class="stat-status status-${hemoColor}">${hemoglobinStatus.message}</div></div>`;
+                }
+                
+                document.getElementById('healthStats').innerHTML = healthStatsHTML;
+                document.getElementById('bmiChartSection').innerHTML = `<h4>Body Mass Index (BMI)</h4><p>Your BMI: <strong>${bmi}</strong> (${bmiCat.category})</p><p style="font-size: 0.85rem; color: #999;">Ranges: Underweight (<18.5) | Normal (18.5-24.9) | Overweight (25-29.9) | Obese (30+)</p>`;
+
+                let recsHTML = '<div class="health-recommendations"><h4>💡 Personalized Health Recommendations</h4><ul>';
+                healthRecs.forEach(rec => { recsHTML += `<li>${rec}</li>`; });
+                recsHTML += '</ul></div>';
+                document.getElementById('healthRecommendations').innerHTML = recsHTML;
+
+                const nextPeriodDate = cycleInfo.nextPeriod.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                document.getElementById('cycleInfo').innerHTML = `
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                        <h3 style="margin-top: 0; margin-bottom: 15px;">🔄 Your Menstrual Cycle Tracking</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>
+                                <p style="font-size: 0.9rem; opacity: 0.9; margin: 0;">Cycle Length</p>
+                                <p style="font-size: 1.8rem; font-weight: bold; margin: 5px 0 0 0;">${cycleInfo.cycleLength} days</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 0.9rem; opacity: 0.9; margin: 0;">Days Into Cycle</p>
+                                <p style="font-size: 1.8rem; font-weight: bold; margin: 5px 0 0 0;">${cycleInfo.daysIntoCurrentCycle}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 0.9rem; opacity: 0.9; margin: 0;">Current Phase</p>
+                                <p style="font-size: 1.1rem; font-weight: bold; margin: 5px 0 0 0;">${recommendations.title}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 0.9rem; opacity: 0.9; margin: 0;">Days Until Next Period</p>
+                                <p style="font-size: 1.8rem; font-weight: bold; margin: 5px 0 0 0;">${cycleInfo.daysUntilNextPeriod}</p>
+                            </div>
+                        </div>
+                        <p style="margin: 15px 0 0 0; font-size: 0.95rem; opacity: 0.95;"><strong>📅 Next Period Expected:</strong> ${nextPeriodDate}</p>
+                    </div>
+                `;
+
+            // Diet card titles based on phase
+            let normalDayTitle = cycleInfo.isPeriodDays ? '🔴 MENSTRUAL PHASE - Period Days' : recommendations.title;
+            let periodDayTitle = '🩸 Normal Days - Between Periods';
+            
+            try {
+                // Normal/Current Day Diet
+                let normalDayHTML = `<h3>${normalDayTitle}</h3><p style="color: #666; margin-bottom: 15px;">${recommendations.subtitle}</p>`;
+                normalDayHTML += '<div class="meal-section"><h4>🍽️ Recommended Meals</h4><div class="meal-list">';
+                if (recommendations.meals && recommendations.meals.length > 0) {
+                    recommendations.meals.forEach(meal => { normalDayHTML += `<p>${meal}</p>`; });
+                } else {
+                    normalDayHTML += '<p>Meals not available</p>';
+                }
+                normalDayHTML += '</div></div>';
+                
+                normalDayHTML += '<div class="meal-section"><h4>🥗 Key Nutrients</h4><div class="nutrition-highlights">';
+                if (recommendations.nutrients && recommendations.nutrients.length > 0) {
+                    recommendations.nutrients.forEach(nutrient => {
+                        normalDayHTML += `<div class="nutrition-card macro"><p>${nutrient}</p></div>`;
+                    });
+                } else {
+                    normalDayHTML += '<p>Nutrients not available</p>';
+                }
+                normalDayHTML += '</div></div>';
+                
+                normalDayHTML += '<div class="meal-section"><h4>⚠️ Foods to Avoid</h4><div class="meal-list">';
+                if (recommendations.avoidance && recommendations.avoidance.length > 0) {
+                    recommendations.avoidance.forEach(item => {
+                        normalDayHTML += `<p>${item}</p>`;
+                    });
+                } else {
+                    normalDayHTML += '<p>Avoid list not available</p>';
+                }
+                normalDayHTML += '</div></div>';
+                
+                normalDayHTML += `<div class="mood-section"><strong>💧 Hydration:</strong><p>${recommendations.hydration || 'Hydration info not available'}</p><strong>💡 Pro Tip:</strong><p>${recommendations.tip || 'Tips not available'}</p></div>`;
+
+                document.getElementById('normalDayCard').innerHTML = normalDayHTML;
+
+                // Non-Period Days Diet (show alternative phases if currently on period)
+                let periodDayHTML = '';
+                
+                if (cycleInfo.isPeriodDays) {
+                    // Show what to expect during normal days
+                    const follicularRec = getDietRecommendations('follicular');
+                    periodDayHTML = `<h3>${periodDayTitle}</h3><p style="color: #666; margin-bottom: 15px;">After your period ends, follow this diet</p>`;
+                    periodDayHTML += '<div class="meal-section"><h4>🍽️ Meals for Normal Days</h4><div class="meal-list">';
+                    if (follicularRec.meals && follicularRec.meals.length > 0) {
+                        follicularRec.meals.forEach(meal => { periodDayHTML += `<p>${meal}</p>`; });
+                    }
+                    periodDayHTML += '</div></div>';
+                    periodDayHTML += '<div class="meal-section"><h4>🥗 Key Nutrients</h4><div class="nutrition-highlights">';
+                    if (follicularRec.nutrients && follicularRec.nutrients.length > 0) {
+                        follicularRec.nutrients.forEach(nutrient => {
+                            periodDayHTML += `<div class="nutrition-card macro"><p>${nutrient}</p></div>`;
+                        });
+                    }
+                    periodDayHTML += '</div></div>';
+                    
+                    // Add period symptoms advice
+                    const moodAdvice = getMoodCravingAdvice(userData.symptoms || []);
+                    if (moodAdvice) {
+                        periodDayHTML += `<div class="mood-section"><strong>🩸 During Your Period Today:</strong>${moodAdvice.split('\n').map(line => line.trim() ? `<p>${line}</p>` : '').join('')}</div>`;
+                    }
+                    
+                    if (userData.periodCravings) {
+                        periodDayHTML += `<div class="meal-section"><h4>🍫 Your Period Cravings</h4><p style="color: #555; padding-left: 15px;">You prefer: ${userData.periodCravings}</p></div>`;
+                    }
+                    
+                    if (userData.periodMood) {
+                        periodDayHTML += `<div class="meal-section"><h4>😊 Mood Support</h4><p style="color: #555; padding-left: 15px;">You feel: ${userData.periodMood}</p></div>`;
+                    }
+                } else {
+                    // Show menstrual phase diet preparation
+                    const menstrualRec = getDietRecommendations('menstrual');
+                    periodDayHTML = `<h3>🩸 During Your Period - Special Food Recommendations</h3><p style="color: #666; margin-bottom: 15px;">In approximately ${cycleInfo.daysUntilNextPeriod} days, prepare for your period with:</p>`;
+                    periodDayHTML += '<div class="meal-section"><h4>🍞 Period Preparation Meals</h4><div class="meal-list">';
+                    if (menstrualRec.meals && menstrualRec.meals.length > 0) {
+                        menstrualRec.meals.forEach(meal => { periodDayHTML += `<p>${meal}</p>`; });
+                    }
+                    periodDayHTML += '</div></div>';
+                    periodDayHTML += '<div class="meal-section"><h4>🥗 Key Nutrients for Period Days</h4><div class="nutrition-highlights">';
+                    if (menstrualRec.nutrients && menstrualRec.nutrients.length > 0) {
+                        menstrualRec.nutrients.forEach(nutrient => {
+                            periodDayHTML += `<div class="nutrition-card macro"><p>${nutrient}</p></div>`;
+                        });
+                    }
+                    periodDayHTML += '</div></div>';
+                }
+
+                document.getElementById('periodDayCard').innerHTML = periodDayHTML;
+            } catch (dietError) {
+                console.error('Error building diet recommendations:', dietError);
+                document.getElementById('normalDayCard').innerHTML = '<p>Error loading diet recommendations. Please refresh the page.</p>';
+                document.getElementById('periodDayCard').innerHTML = '<p>Error loading period diet recommendations. Please refresh the page.</p>';
+            }
+            
+            // Show feedback section
+            try {
+                document.getElementById('feedbackSection').style.display = 'block';
+                document.getElementById('nextCycleSection').style.display = 'none';
+
+                currentStep = 5;
+                updateUI();
+                document.getElementById('results').classList.add('active');
+                document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.step').forEach((el, index) => {
+                    el.classList.remove('active');
+                    if (index < 4) el.classList.add('completed');
+                });
+            } catch (uiError) {
+                console.error('Error updating UI:', uiError);
+            }
+            } catch (error) {
+                console.error('Critical error in showResults:', error);
+                alert('An error occurred while generating your results. Please check the console and try again.');
+            }
+        }
+
+        function saveFeedback() {
+            const helpfulness = document.getElementById('helpfulness').value;
+            const suggestions = document.getElementById('suggestions').value;
+            
+            if (!helpfulness) {
+                alert('Please select a rating');
+                return;
+            }
+            
+            userData.feedback = {
+                helpfulness: helpfulness,
+                suggestions: suggestions,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            localStorage.setItem('dietPlanData', JSON.stringify(userData));
+            document.getElementById('feedbackSection').style.display = 'none';
+            document.getElementById('nextCycleSection').style.display = 'block';
+            
+            // Generate next cycle info
+            const cycleInfo = calculateCycleInfo();
+            const nextCyclePeriodDate = new Date(cycleInfo.nextPeriod);
+            const cycleDayAfterNext = new Date(nextCyclePeriodDate);
+            cycleDayAfterNext.setDate(cycleDayAfterNext.getDate() + cycleInfo.periodDuration);
+            
+            document.getElementById('nextCycleInfo').innerHTML = `
+                <p><strong>🗓️ Your Next Cycle Starts:</strong> ${cycleInfo.nextPeriod.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                <p><strong>🩸 Period Duration:</strong> ~${cycleInfo.periodDuration} days</p>
+                <p><strong>💪 Next Follicular Phase Starts:</strong> ${cycleDayAfterNext.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">💡 Pro Tip: Mark these dates in your calendar to better plan your meals and exercise!</p>
+            `;
+            
+            alert('Thank you for your feedback! We\'ll use it to improve your experience.');
+        }
+
+        function resetApp() {
+            if (confirm('Start over and clear all data?')) {
+                localStorage.removeItem('dietPlanData');
+                userData = {};
+                currentStep = 1;
+                document.querySelectorAll('form').forEach(f => f.reset());
+                document.getElementById('results').classList.remove('active');
+                updateUI();
+            }
+        }
+    </script>
+</body>
+</html>
