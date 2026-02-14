@@ -2,16 +2,16 @@
   <img src="./img.png" alt="Project Banner" width="100%">
 </p>
 
-# [fem-health] 🎯
+# fem-health 🎯
 
 ## basic details:-ITS A DIET PLAN CUM MESTSTRUAL CYCLE TRACKER WITH SUGGESTING DIET PALN BASED OF THEIR MOOD ,PAIN,CRAVINGS.
                   
 
-### Team Name: [hackstreet girls]
+### Team Name: hackstreet girls
 
 ### Team Members
-- Member 1: [Aneena chandran] - [LBS college of engineering kasaragod]
-- Member 2: [Veda sudheeshan] - [LBS college of engineering kasaragod]
+- Member 1: Aneena chandran - LBS college of engineering kasaragod
+- Member 2: Veda sudheeshan - LBS college of engineering kasaragod
 
 ### Hosted Project Link
 https://vedanena-epjh.vercel.app/
@@ -32,10 +32,10 @@ https://vedanena-epjh.vercel.app/
 ### Technologies/Components Used
 
 **For Software:**
-- Languages used: [CSS,JavaScript, Python, Java,HTML]
-- Frameworks used: [ Spring Boot]
-- Libraries used: [pandas, JUnit]
-- Tools used: [e.g., VS Code, Git,SUPABASE ]
+- Languages used: CSS,JavaScript, Python, Java,HTML
+- Frameworks used:  Spring Boot
+- Libraries used: pandas, JUnit
+- Tools used: e.g., VS Code, Git,SUPABASE 
 
 
 ## Features
